@@ -1,0 +1,32 @@
+{
+  "name": "arithmetic",
+  "description": "Basic arithmetic operations",
+  "difficulty": "easy",
+  "tasks": [
+    {"id": "arith_001", "question": "What is 234 + 567?", "answer": 801, "category": "addition"},
+    {"id": "arith_002", "question": "What is 1000 - 387?", "answer": 613, "category": "subtraction"},
+    {"id": "arith_003", "question": "What is 25 * 16?", "answer": 400, "category": "multiplication"},
+    {"id": "arith_004", "question": "What is 144 / 12?", "answer": 12, "category": "division"},
+    {"id": "arith_005", "question": "What is 15% of 200?", "answer": 30, "category": "percentage"},
+    {"id": "arith_006", "question": "What is 25% of 80?", "answer": 20, "category": "percentage"},
+    {"id": "arith_007", "question": "What is 3/4 + 1/2?", "answer": 1.25, "category": "fractions"},
+    {"id": "arith_008", "question": "What is 2/3 * 9?", "answer": 6, "category": "fractions"},
+    {"id": "arith_009", "question": "What is 5^3?", "answer": 125, "category": "exponents"},
+    {"id": "arith_010", "question": "What is the square root of 169?", "answer": 13, "category": "roots"},
+    {"id": "arith_011", "question": "What is 456 + 789 + 123?", "answer": 1368, "category": "addition"},
+    {"id": "arith_012", "question": "What is 1500 - 876?", "answer": 624, "category": "subtraction"},
+    {"id": "arith_013", "question": "What is 32 * 25?", "answer": 800, "category": "multiplication"},
+    {"id": "arith_014", "question": "What is 625 / 25?", "answer": 25, "category": "division"},
+    {"id": "arith_015", "question": "What is 40% of 150?", "answer": 60, "category": "percentage"},
+    {"id": "arith_016", "question": "What is 12.5% of 400?", "answer": 50, "category": "percentage"},
+    {"id": "arith_017", "question": "What is 7/8 - 1/4?", "answer": 0.625, "category": "fractions"},
+    {"id": "arith_018", "question": "What is 2^8?", "answer": 256, "category": "exponents"},
+    {"id": "arith_019", "question": "What is the square root of 256?", "answer": 16, "category": "roots"},
+    {"id": "arith_020", "question": "What is 999 + 1?", "answer": 1000, "category": "addition"},
+    {"id": "arith_021", "question": "What is 50 * 50?", "answer": 2500, "category": "multiplication"},
+    {"id": "arith_022", "question": "What is 1000 / 8?", "answer": 125, "category": "division"},
+    {"id": "arith_023", "question": "What is 75% of 120?", "answer": 90, "category": "percentage"},
+    {"id": "arith_024", "question": "What is 5/6 + 1/3?", "answer": 1.1666666666666667, "category": "fractions"},
+    {"id": "arith_025", "question": "What is 10^4?", "answer": 10000, "category": "exponents"}
+  ]
+}
