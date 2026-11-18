@@ -1,0 +1,27 @@
+{
+  "name": "logic",
+  "description": "Word problems and logical reasoning",
+  "difficulty": "hard",
+  "tasks": [
+    {"id": "logic_001", "question": "John has 3 times as many apples as Mary. Together they have 24 apples. How many apples does John have?", "answer": 18, "category": "word_problem"},
+    {"id": "logic_002", "question": "A train travels 120 km in 2 hours. What is its speed in km/h?", "answer": 60, "category": "rate"},
+    {"id": "logic_003", "question": "If you buy 3 books at $15 each and get a 20% discount, how much do you pay in total?", "answer": 36, "category": "discount"},
+    {"id": "logic_004", "question": "The sum of two numbers is 50. One number is 14 more than the other. What is the larger number?", "answer": 32, "category": "word_problem"},
+    {"id": "logic_005", "question": "A rectangle has a perimeter of 36 cm. If the length is twice the width, what is the length in cm?", "answer": 12, "category": "geometry"},
+    {"id": "logic_006", "question": "If 5 workers can complete a job in 8 days, how many days would it take 10 workers?", "answer": 4, "category": "work"},
+    {"id": "logic_007", "question": "A shop sells an item for $80 after a 20% markup. What was the original cost?", "answer": 66.67, "category": "markup"},
+    {"id": "logic_008", "question": "The average of 5 numbers is 20. If four of the numbers are 15, 18, 22, and 25, what is the fifth number?", "answer": 20, "category": "average"},
+    {"id": "logic_009", "question": "A car uses 8 liters of fuel per 100 km. How many liters are needed for 350 km?", "answer": 28, "category": "rate"},
+    {"id": "logic_010", "question": "Tom is twice as old as Jerry. In 5 years, Tom will be 25. How old is Jerry now?", "answer": 10, "category": "age"},
+    {"id": "logic_011", "question": "A store offers 'buy 2, get 1 free'. If each item costs $30, how much do you pay for 6 items?", "answer": 120, "category": "discount"},
+    {"id": "logic_012", "question": "If the ratio of boys to girls in a class is 3:2 and there are 30 students total, how many boys are there?", "answer": 18, "category": "ratio"},
+    {"id": "logic_013", "question": "A pool fills at 50 liters per minute. How many minutes to fill a 2000 liter pool?", "answer": 40, "category": "rate"},
+    {"id": "logic_014", "question": "After spending 40% of his money, Bob has $60 left. How much did he have originally?", "answer": 100, "category": "percentage"},
+    {"id": "logic_015", "question": "Three consecutive even numbers sum to 48. What is the largest of these numbers?", "answer": 18, "category": "sequence"},
+    {"id": "logic_016", "question": "A bike costs $240 after a 25% discount. What was the original price?", "answer": 320, "category": "discount"},
+    {"id": "logic_017", "question": "If 8 machines produce 400 units in 5 hours, how many units can 4 machines produce in 10 hours?", "answer": 400, "category": "work"},
+    {"id": "logic_018", "question": "The sum of three numbers is 90. The second is twice the first, and the third is three times the first. What is the third number?", "answer": 45, "category": "word_problem"},
+    {"id": "logic_019", "question": "A triangle has angles in the ratio 1:2:3. What is the largest angle in degrees?", "answer": 90, "category": "geometry"},
+    {"id": "logic_020", "question": "If you invest $1000 at 5% simple interest per year, how much interest do you earn in 3 years?", "answer": 150, "category": "interest"}
+  ]
+}
