@@ -26,6 +26,10 @@ class ConsensusRequest(BaseModel):
         le=2.0,
         description="Sampling temperature (0.0 for deterministic)",
     )
+    use_judge: bool = Field(
+        default=True,
+        description="Use judge model to resolve disagreements between models",
+    )
 
     model_config = {
         "json_schema_extra": {
@@ -34,6 +38,7 @@ class ConsensusRequest(BaseModel):
                 "models": ["ollama/llama3.2", "ollama/mistral"],
                 "require_structured": True,
                 "temperature": 0.0,
+                "use_judge": True,
             }
         }
     }
