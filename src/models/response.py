@@ -44,9 +44,9 @@ class ConsensusResponse(BaseModel):
 
     consensus: ConsensusResult = Field(description="Consensus analysis result")
     models: dict[str, ModelResult] = Field(description="Results from each model")
-    metadata: dict[str, float | int | str] = Field(
+    metadata: dict[str, float | int | str | bool] = Field(
         default_factory=dict,
-        description="Additional metadata (latency, method, etc.)",
+        description="Additional metadata (latency, method, judge info, etc.)",
     )
 
     model_config = {
