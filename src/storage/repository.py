@@ -188,3 +188,44 @@ class BenchmarkRepository:
                 agg["avg_tokens"] = 0.0
 
         return aggregated
+
+    async def get_aggregated_consensus_stats(self) -> dict[str, float | int]:
+        """Get aggregated consensus statistics across all benchmark runs.
+
+        Returns:
+            Dict with total counts and rates for consensus agreement levels.
+        """
+        result = await self._session.execute(select(BenchmarkRunModel))
+        all_runs = result.scalars().all()
+
+        total_unanimous = 0
+        total_majority = 0
+        total_disagreement = 0
+        total_tasks = 0
+
+        for run in all_runs:
+            total_unanimous += run.unanimous_agreement
+            total_majority += run.majority_agreement
+            total_disagreement += run.disagreement
+            total_tasks += run.total_tasks
+
+        # Calculate rates
+        if total_tasks > 0:
+            unanimous_rate = total_unanimous / total_tasks
+            majority_rate = total_majority / total_tasks
+            disagreement_rate = total_disagreement / total_tasks
+        else:
+            unanimous_rate = 0.0
+            majority_rate = 0.0
+            disagreement_rate = 0.0
+
+        return {
+            "total_tasks": total_tasks,
+            "total_benchmark_runs": len(all_runs),
+            "unanimous_agreement": total_unanimous,
+            "majority_agreement": total_majority,
+            "disagreement": total_disagreement,
+            "unanimous_rate": unanimous_rate,
+            "majority_rate": majority_rate,
+            "disagreement_rate": disagreement_rate,
+        }
