@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.api.routes import benchmark, consensus, metrics
 from src.core.config import get_settings
 from src.core.logging import get_logger, setup_logging
+from src.storage.database import init_db
 
 logger = get_logger(__name__)
 
@@ -25,6 +26,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         version=settings.app_version,
         debug=settings.debug,
     )
+
+    # Initialize database
+    await init_db()
+    logger.info("database_initialized")
 
     yield
 
