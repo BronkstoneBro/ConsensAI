@@ -41,6 +41,16 @@ class Settings(BaseSettings):
     max_retries: int = 3
     retry_delay_seconds: float = 1.0
 
+    # Judge model for resolving disagreements
+    judge_model: str = Field(
+        default="groq/llama-3.3-70b-versatile",
+        description="Model to use as judge when models disagree",
+    )
+    use_judge_on_disagreement: bool = Field(
+        default=True,
+        description="Whether to use judge model when models disagree",
+    )
+
     # Database
     database_url: str = "sqlite+aiosqlite:///./data/consensai.db"
 
