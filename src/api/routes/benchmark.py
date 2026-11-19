@@ -2,12 +2,13 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from src.api.dependencies import get_benchmark_service
+from src.api.dependencies import get_benchmark_repository, get_benchmark_service
 from src.benchmark.runner import BenchmarkConfig, BenchmarkRunner
 from src.core.exceptions import BenchmarkError
 from src.core.logging import get_logger
 from src.models.request import BenchmarkRequest
 from src.models.response import BenchmarkModelStats, BenchmarkResponse, ConsensusStats
+from src.storage.repository import BenchmarkRepository
 
 logger = get_logger(__name__)
 
@@ -24,6 +25,7 @@ router = APIRouter()
 async def run_benchmark(
     request: BenchmarkRequest,
     runner: BenchmarkRunner = Depends(get_benchmark_service),
+    repository: BenchmarkRepository = Depends(get_benchmark_repository),
 ) -> BenchmarkResponse:
     """Run benchmark on specified dataset.
 
@@ -52,6 +54,10 @@ async def run_benchmark(
 
         # Run benchmark
         run = await runner.run(config)
+
+        # Save results to database
+        await repository.save_benchmark_run(run)
+        logger.info("benchmark_saved_to_db", benchmark_id=run.benchmark_id)
 
         # Convert to response
         results = {}
@@ -99,14 +105,48 @@ async def run_benchmark(
     summary="Get benchmark status",
     description="Get the status and results of a benchmark run.",
 )
-async def get_benchmark(benchmark_id: str) -> BenchmarkResponse:
+async def get_benchmark(
+    benchmark_id: str,
+    repository: BenchmarkRepository = Depends(get_benchmark_repository),
+) -> BenchmarkResponse:
     """Get benchmark status and results by ID."""
     logger.info("benchmark_status_requested", benchmark_id=benchmark_id)
 
-    # TODO: Implement database lookup
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail={"code": "NOT_FOUND", "message": f"Benchmark {benchmark_id} not found"},
+    # Fetch benchmark run from database
+    run = await repository.get_benchmark_run(benchmark_id)
+
+    if run is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"code": "NOT_FOUND", "message": f"Benchmark {benchmark_id} not found"},
+        )
+
+    # Fetch model stats
+    model_stats_list = await repository.get_model_stats_for_run(run.id)
+
+    # Convert to response
+    results = {}
+    for stats in model_stats_list:
+        results[stats.model] = BenchmarkModelStats(
+            accuracy=stats.accuracy,
+            avg_latency_ms=stats.avg_latency_ms,
+            avg_tokens=stats.avg_tokens,
+            total_tasks=stats.total_tasks,
+            correct=stats.correct,
+            incorrect=stats.incorrect,
+            errors=stats.errors,
+        )
+
+    return BenchmarkResponse(
+        benchmark_id=run.benchmark_id,
+        status=run.status,
+        dataset=run.dataset,
+        results=results,
+        consensus_stats=ConsensusStats(
+            unanimous_agreement=run.unanimous_agreement,
+            majority_agreement=run.majority_agreement,
+            disagreement=run.disagreement,
+        ),
     )
 
 
