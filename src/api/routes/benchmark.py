@@ -151,6 +151,30 @@ async def get_benchmark(
 
 
 @router.get(
+    "/benchmark/list",
+    summary="List benchmark runs",
+    description="Get list of all benchmark runs.",
+)
+async def list_benchmarks(
+    limit: int = 50,
+    offset: int = 0,
+    repository: BenchmarkRepository = Depends(get_benchmark_repository),
+) -> list[dict]:
+    """List all benchmark runs with basic info."""
+    runs = await repository.get_all_benchmark_runs(limit=limit, offset=offset)
+    return [
+        {
+            "benchmark_id": run.benchmark_id,
+            "dataset": run.dataset,
+            "status": run.status,
+            "total_tasks": run.total_tasks,
+            "created_at": run.created_at.isoformat() if run.created_at else None,
+        }
+        for run in runs
+    ]
+
+
+@router.get(
     "/datasets",
     summary="List available datasets",
     description="Get list of available benchmark datasets.",
