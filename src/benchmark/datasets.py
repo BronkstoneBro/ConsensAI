@@ -1,4 +1,4 @@
-"""Dataset loading and management for benchmarking."""
+"""Dataset loading for benchmarking."""
 
 import json
 from pathlib import Path
@@ -10,23 +10,10 @@ from src.models.math_task import Category, Difficulty, MathTask
 logger = get_logger(__name__)
 
 DATASETS_PATH = Path(__file__).parent.parent.parent / "data" / "math_tasks"
-
 AVAILABLE_DATASETS = ["arithmetic", "algebra", "logic"]
 
 
 def load_dataset(name: str, limit: int | None = None) -> list[MathTask]:
-    """Load a dataset of math tasks.
-
-    Args:
-        name: Dataset name ('arithmetic', 'algebra', 'logic').
-        limit: Maximum number of tasks to load.
-
-    Returns:
-        List of MathTask objects.
-
-    Raises:
-        BenchmarkError: If dataset not found or invalid.
-    """
     if name not in AVAILABLE_DATASETS:
         raise BenchmarkError(
             f"Unknown dataset: {name}. Available: {AVAILABLE_DATASETS}"
@@ -73,7 +60,6 @@ def load_dataset(name: str, limit: int | None = None) -> list[MathTask]:
 
 
 def _map_category(category_str: str) -> Category:
-    """Map string category to Category enum."""
     category_mapping = {
         "addition": Category.ARITHMETIC,
         "subtraction": Category.ARITHMETIC,
@@ -102,14 +88,6 @@ def _map_category(category_str: str) -> Category:
 
 
 def get_all_tasks(limit_per_dataset: int | None = None) -> list[MathTask]:
-    """Load all tasks from all datasets.
-
-    Args:
-        limit_per_dataset: Maximum tasks per dataset.
-
-    Returns:
-        Combined list of all tasks.
-    """
     all_tasks = []
     for dataset_name in AVAILABLE_DATASETS:
         tasks = load_dataset(dataset_name, limit=limit_per_dataset)

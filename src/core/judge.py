@@ -15,8 +15,6 @@ logger = get_logger(__name__)
 
 @dataclass
 class JudgeDecision:
-    """Result of judge model evaluation."""
-
     correct_answer: float | None
     winning_model: str | None
     analysis: list[str]
@@ -28,23 +26,13 @@ class JudgeDecision:
 
 
 class JudgeService:
-    """Service for using a judge model to resolve disagreements.
-
-    When models disagree on an answer, the judge analyzes all responses
-    and determines which answer is most likely correct.
-    """
+    """Resolves model disagreements by analyzing all responses."""
 
     def __init__(
         self,
         provider: ICompletionProvider,
         judge_model: str | None = None,
     ) -> None:
-        """Initialize judge service.
-
-        Args:
-            provider: LLM completion provider.
-            judge_model: Model to use as judge. Defaults to settings.judge_model.
-        """
         self._provider = provider
         self._settings = get_settings()
         self._judge_model = judge_model or self._settings.judge_model
@@ -54,15 +42,6 @@ class JudgeService:
         question: str,
         solutions: dict[str, MathSolution],
     ) -> JudgeDecision:
-        """Ask judge model to evaluate multiple solutions.
-
-        Args:
-            question: Original math question.
-            solutions: Dict mapping model name to its MathSolution.
-
-        Returns:
-            JudgeDecision with the judge's verdict.
-        """
         logger.info(
             "judge_evaluation_started",
             question_length=len(question),
@@ -112,18 +91,7 @@ class JudgeService:
                 error=str(e),
             )
 
-    def _format_solutions(
-        self,
-        solutions: dict[str, MathSolution],
-    ) -> dict[str, str]:
-        """Format solutions for judge prompt.
-
-        Args:
-            solutions: Dict mapping model name to MathSolution.
-
-        Returns:
-            Dict mapping model name to formatted answer string.
-        """
+    def _format_solutions(self, solutions: dict[str, MathSolution]) -> dict[str, str]:
         formatted = {}
         for model, solution in solutions.items():
             steps_str = " -> ".join(solution.steps) if solution.steps else "no steps"
@@ -140,16 +108,6 @@ class JudgeService:
         judge_model: str,
         latency_ms: float,
     ) -> JudgeDecision:
-        """Parse judge model response.
-
-        Args:
-            content: Raw response from judge model.
-            judge_model: Model used as judge.
-            latency_ms: Response latency.
-
-        Returns:
-            JudgeDecision parsed from response.
-        """
         try:
             # Try to parse JSON directly
             data = self._extract_json(content)
@@ -182,17 +140,6 @@ class JudgeService:
             )
 
     def _extract_json(self, content: str) -> dict:
-        """Extract JSON from response content.
-
-        Args:
-            content: Raw response text.
-
-        Returns:
-            Parsed JSON dict.
-
-        Raises:
-            json.JSONDecodeError: If JSON cannot be parsed.
-        """
         # Try direct parse
         try:
             return json.loads(content)
@@ -212,15 +159,6 @@ class JudgeService:
         raise json.JSONDecodeError("No JSON found", content, 0)
 
     def _extract_number_from_text(self, content: str) -> float | None:
-        """Extract a number from text as fallback.
-
-        Args:
-            content: Text to extract number from.
-
-        Returns:
-            Extracted number or None.
-        """
-        # Look for patterns like "correct answer is X" or "answer: X"
         patterns = [
             r"correct[_ ]answer[:\s]+(-?\d+\.?\d*)",
             r"answer[:\s]+(-?\d+\.?\d*)",

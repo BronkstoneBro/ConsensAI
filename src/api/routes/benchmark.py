@@ -27,11 +27,6 @@ async def run_benchmark(
     runner: BenchmarkRunner = Depends(get_benchmark_service),
     repository: BenchmarkRepository = Depends(get_benchmark_repository),
 ) -> BenchmarkResponse:
-    """Run benchmark on specified dataset.
-
-    Evaluates multiple models on math tasks and returns accuracy,
-    latency, and consensus statistics.
-    """
     logger.info(
         "benchmark_request_received",
         dataset=request.dataset,
@@ -109,7 +104,6 @@ async def get_benchmark(
     benchmark_id: str,
     repository: BenchmarkRepository = Depends(get_benchmark_repository),
 ) -> BenchmarkResponse:
-    """Get benchmark status and results by ID."""
     logger.info("benchmark_status_requested", benchmark_id=benchmark_id)
 
     # Fetch benchmark run from database
@@ -160,7 +154,6 @@ async def list_benchmarks(
     offset: int = 0,
     repository: BenchmarkRepository = Depends(get_benchmark_repository),
 ) -> list[dict]:
-    """List all benchmark runs with basic info."""
     runs = await repository.get_all_benchmark_runs(limit=limit, offset=offset)
     return [
         {
@@ -180,7 +173,6 @@ async def list_benchmarks(
     description="Get list of available benchmark datasets.",
 )
 async def list_datasets() -> dict:
-    """List available benchmark datasets."""
     from src.benchmark.datasets import AVAILABLE_DATASETS
 
     return {

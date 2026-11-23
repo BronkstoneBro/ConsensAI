@@ -13,8 +13,6 @@ logger = get_logger(__name__)
 
 @dataclass
 class ConsensusAnalysisResult:
-    """Result of consensus analysis."""
-
     answer: float | None
     confidence: float
     agreement: AgreementLevel
@@ -23,50 +21,18 @@ class ConsensusAnalysisResult:
 
 
 class IConsensusStrategy(ABC):
-    """Interface for consensus determination strategies."""
-
     @abstractmethod
-    def analyze(
-        self,
-        solutions: dict[str, MathSolution],
-    ) -> ConsensusAnalysisResult:
-        """Analyze solutions and determine consensus.
-
-        Args:
-            solutions: Dict mapping model name to its MathSolution.
-
-        Returns:
-            ConsensusAnalysisResult with consensus answer and metadata.
-        """
+    def analyze(self, solutions: dict[str, MathSolution]) -> ConsensusAnalysisResult:
+        pass
 
 
 class ExactMatchStrategy(IConsensusStrategy):
-    """Consensus strategy using exact numeric match.
-
-    Groups answers that are equal within a tolerance and returns
-    the answer with the most votes.
-    """
+    """Groups answers within tolerance and returns the most common."""
 
     def __init__(self, tolerance: float = 0.001) -> None:
-        """Initialize with numeric tolerance.
-
-        Args:
-            tolerance: Maximum difference to consider answers equal.
-        """
         self._tolerance = tolerance
 
-    def analyze(
-        self,
-        solutions: dict[str, MathSolution],
-    ) -> ConsensusAnalysisResult:
-        """Analyze solutions using exact match.
-
-        Args:
-            solutions: Dict mapping model name to its MathSolution.
-
-        Returns:
-            ConsensusAnalysisResult with consensus.
-        """
+    def analyze(self, solutions: dict[str, MathSolution]) -> ConsensusAnalysisResult:
         if not solutions:
             return ConsensusAnalysisResult(
                 answer=None,
@@ -134,31 +100,12 @@ class ExactMatchStrategy(IConsensusStrategy):
 
 
 class MajorityVoteStrategy(IConsensusStrategy):
-    """Consensus strategy using majority voting.
-
-    Rounds answers to specified precision before voting.
-    """
+    """Rounds answers to precision and returns the most common."""
 
     def __init__(self, precision: int = 2) -> None:
-        """Initialize with rounding precision.
-
-        Args:
-            precision: Decimal places to round to before voting.
-        """
         self._precision = precision
 
-    def analyze(
-        self,
-        solutions: dict[str, MathSolution],
-    ) -> ConsensusAnalysisResult:
-        """Analyze solutions using majority vote.
-
-        Args:
-            solutions: Dict mapping model name to its MathSolution.
-
-        Returns:
-            ConsensusAnalysisResult with consensus.
-        """
+    def analyze(self, solutions: dict[str, MathSolution]) -> ConsensusAnalysisResult:
         if not solutions:
             return ConsensusAnalysisResult(
                 answer=None,
@@ -214,23 +161,9 @@ class MajorityVoteStrategy(IConsensusStrategy):
 
 
 class WeightedConfidenceStrategy(IConsensusStrategy):
-    """Consensus strategy weighting by model confidence.
+    """Weights votes by model-reported confidence."""
 
-    Uses model-reported confidence to weight votes.
-    """
-
-    def analyze(
-        self,
-        solutions: dict[str, MathSolution],
-    ) -> ConsensusAnalysisResult:
-        """Analyze solutions using weighted confidence.
-
-        Args:
-            solutions: Dict mapping model name to its MathSolution.
-
-        Returns:
-            ConsensusAnalysisResult with consensus.
-        """
+    def analyze(self, solutions: dict[str, MathSolution]) -> ConsensusAnalysisResult:
         if not solutions:
             return ConsensusAnalysisResult(
                 answer=None,
@@ -293,13 +226,9 @@ class WeightedConfidenceStrategy(IConsensusStrategy):
 
 
 class ConsensusAnalyzer:
-    """Main consensus analyzer with multiple strategies.
-
-    Provides a unified interface to different consensus algorithms.
-    """
+    """Unified interface to different consensus algorithms."""
 
     def __init__(self) -> None:
-        """Initialize with default strategies."""
         self._strategies: dict[str, IConsensusStrategy] = {
             "exact_match": ExactMatchStrategy(),
             "majority_vote": MajorityVoteStrategy(),
@@ -311,41 +240,15 @@ class ConsensusAnalyzer:
         solutions: dict[str, MathSolution],
         strategy: str = "exact_match",
     ) -> ConsensusAnalysisResult:
-        """Analyze solutions using specified strategy.
-
-        Args:
-            solutions: Dict mapping model name to its MathSolution.
-            strategy: Strategy name ('exact_match', 'majority_vote', 'weighted_confidence').
-
-        Returns:
-            ConsensusAnalysisResult with consensus.
-
-        Raises:
-            ValueError: If strategy is not found.
-        """
         if strategy not in self._strategies:
             raise ValueError(
                 f"Unknown strategy: {strategy}. "
                 f"Available: {list(self._strategies.keys())}"
             )
-
         return self._strategies[strategy].analyze(solutions)
 
-    def auto_analyze(
-        self,
-        solutions: dict[str, MathSolution],
-    ) -> ConsensusAnalysisResult:
-        """Automatically choose best strategy based on data.
-
-        Uses exact_match by default, falls back to weighted_confidence
-        if there's disagreement.
-
-        Args:
-            solutions: Dict mapping model name to its MathSolution.
-
-        Returns:
-            ConsensusAnalysisResult with consensus.
-        """
+    def auto_analyze(self, solutions: dict[str, MathSolution]) -> ConsensusAnalysisResult:
+        """Uses exact_match, falls back to weighted_confidence on disagreement."""
         # Try exact match first
         result = self._strategies["exact_match"].analyze(solutions)
 

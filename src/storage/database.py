@@ -20,12 +20,10 @@ from src.core.config import get_settings
 
 
 class Base(DeclarativeBase):
-    """SQLAlchemy declarative base."""
+    pass
 
 
 class BenchmarkRunModel(Base):
-    """Benchmark run record."""
-
     __tablename__ = "benchmark_runs"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -47,8 +45,6 @@ class BenchmarkRunModel(Base):
 
 
 class ModelStatsModel(Base):
-    """Model statistics for a benchmark run."""
-
     __tablename__ = "model_stats"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -69,8 +65,6 @@ class ModelStatsModel(Base):
 
 
 class TaskResultModel(Base):
-    """Individual task result."""
-
     __tablename__ = "task_results"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -91,8 +85,6 @@ class TaskResultModel(Base):
 
 
 class ConsensusRequestModel(Base):
-    """Consensus request log."""
-
     __tablename__ = "consensus_requests"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -105,25 +97,19 @@ class ConsensusRequestModel(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
-# Database engine and session
 _engine = None
 _session_factory = None
 
 
 async def get_engine():
-    """Get or create database engine."""
     global _engine
     if _engine is None:
         settings = get_settings()
-        _engine = create_async_engine(
-            settings.database_url,
-            echo=settings.debug,
-        )
+        _engine = create_async_engine(settings.database_url, echo=settings.debug)
     return _engine
 
 
 async def get_session_factory():
-    """Get or create session factory."""
     global _session_factory
     if _session_factory is None:
         engine = await get_engine()
@@ -132,14 +118,12 @@ async def get_session_factory():
 
 
 async def init_db() -> None:
-    """Initialize database tables."""
     engine = await get_engine()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
 
 async def get_db_session() -> AsyncSession:
-    """Get database session."""
     factory = await get_session_factory()
     async with factory() as session:
         yield session

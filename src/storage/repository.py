@@ -16,23 +16,10 @@ logger = get_logger(__name__)
 
 
 class BenchmarkRepository:
-    """Repository for benchmark data operations."""
-
     def __init__(self, session: AsyncSession) -> None:
-        """Initialize repository with database session.
-
-        Args:
-            session: SQLAlchemy async session.
-        """
         self._session = session
 
     async def save_benchmark_run(self, run: BenchmarkRun) -> None:
-        """Save benchmark run to database.
-
-        Args:
-            run: Benchmark run to save.
-        """
-        # Create benchmark run record
         db_run = BenchmarkRunModel(
             benchmark_id=run.benchmark_id,
             dataset=run.dataset,
@@ -92,14 +79,6 @@ class BenchmarkRepository:
         )
 
     async def get_benchmark_run(self, benchmark_id: str) -> BenchmarkRunModel | None:
-        """Get benchmark run by ID.
-
-        Args:
-            benchmark_id: Benchmark identifier.
-
-        Returns:
-            Benchmark run record or None.
-        """
         result = await self._session.execute(
             select(BenchmarkRunModel).where(
                 BenchmarkRunModel.benchmark_id == benchmark_id
@@ -112,15 +91,6 @@ class BenchmarkRepository:
         limit: int = 100,
         offset: int = 0,
     ) -> list[BenchmarkRunModel]:
-        """Get all benchmark runs.
-
-        Args:
-            limit: Maximum number of records.
-            offset: Number of records to skip.
-
-        Returns:
-            List of benchmark runs.
-        """
         result = await self._session.execute(
             select(BenchmarkRunModel)
             .order_by(BenchmarkRunModel.created_at.desc())
@@ -129,18 +99,7 @@ class BenchmarkRepository:
         )
         return list(result.scalars().all())
 
-    async def get_model_stats_for_run(
-        self,
-        benchmark_run_id: int,
-    ) -> list[ModelStatsModel]:
-        """Get model stats for a benchmark run.
-
-        Args:
-            benchmark_run_id: Benchmark run database ID.
-
-        Returns:
-            List of model stats.
-        """
+    async def get_model_stats_for_run(self, benchmark_run_id: int) -> list[ModelStatsModel]:
         result = await self._session.execute(
             select(ModelStatsModel).where(
                 ModelStatsModel.benchmark_run_id == benchmark_run_id
@@ -149,11 +108,6 @@ class BenchmarkRepository:
         return list(result.scalars().all())
 
     async def get_aggregated_model_stats(self) -> dict[str, dict]:
-        """Get aggregated statistics across all benchmark runs.
-
-        Returns:
-            Dict mapping model name to aggregated stats.
-        """
         result = await self._session.execute(select(ModelStatsModel))
         all_stats = result.scalars().all()
 
@@ -190,11 +144,6 @@ class BenchmarkRepository:
         return aggregated
 
     async def get_aggregated_consensus_stats(self) -> dict[str, float | int]:
-        """Get aggregated consensus statistics across all benchmark runs.
-
-        Returns:
-            Dict with total counts and rates for consensus agreement levels.
-        """
         result = await self._session.execute(select(BenchmarkRunModel))
         all_runs = result.scalars().all()
 

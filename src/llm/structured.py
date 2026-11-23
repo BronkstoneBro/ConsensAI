@@ -11,23 +11,11 @@ logger = get_logger(__name__)
 
 
 class ResponseParser:
-    """Parser for extracting structured data from LLM responses."""
+    """Extracts structured data from LLM responses (JSON, numbers)."""
 
     @staticmethod
     def extract_json(text: str) -> dict[str, Any] | None:
-        """Extract JSON from LLM response text.
-
-        Handles various formats:
-        - Pure JSON
-        - JSON in markdown code blocks
-        - JSON mixed with other text
-
-        Args:
-            text: Raw response text from LLM.
-
-        Returns:
-            Parsed JSON dict or None if extraction failed.
-        """
+        """Handles pure JSON, markdown code blocks, and mixed text."""
         # Try to parse as pure JSON first
         try:
             return json.loads(text.strip())
@@ -62,15 +50,6 @@ class ResponseParser:
 
     @staticmethod
     def extract_number(text: str) -> float | None:
-        """Extract a number from text as fallback.
-
-        Args:
-            text: Text that may contain a number.
-
-        Returns:
-            Extracted number or None.
-        """
-        # Look for numbers in various formats
         patterns = [
             r"answer[:\s]+(-?\d+\.?\d*)",
             r"=\s*(-?\d+\.?\d*)",
@@ -90,14 +69,6 @@ class ResponseParser:
 
     @classmethod
     def parse_math_solution(cls, text: str) -> MathSolution | None:
-        """Parse LLM response into MathSolution.
-
-        Args:
-            text: Raw response text from LLM.
-
-        Returns:
-            MathSolution or None if parsing failed.
-        """
         # Try JSON extraction first
         json_data = cls.extract_json(text)
 

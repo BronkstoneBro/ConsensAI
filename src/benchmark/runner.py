@@ -1,6 +1,5 @@
 """Benchmark runner for evaluating models on math tasks."""
 
-import asyncio
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -22,8 +21,6 @@ logger = get_logger(__name__)
 
 @dataclass
 class BenchmarkConfig:
-    """Configuration for benchmark run."""
-
     dataset: str
     models: list[str]
     limit: int | None = None
@@ -32,8 +29,6 @@ class BenchmarkConfig:
 
 @dataclass
 class BenchmarkRun:
-    """Results of a benchmark run."""
-
     benchmark_id: str
     dataset: str
     models: list[str]
@@ -45,14 +40,7 @@ class BenchmarkRun:
 
 
 class BenchmarkRunner:
-    """Runs benchmarks on math task datasets."""
-
     def __init__(self, provider: ICompletionProvider) -> None:
-        """Initialize runner with LLM provider.
-
-        Args:
-            provider: LLM completion provider.
-        """
         self._orchestrator = ModelOrchestrator(provider)
         self._parser = ResponseParser()
         self._evaluator = Evaluator()
@@ -60,14 +48,6 @@ class BenchmarkRunner:
         self._settings = get_settings()
 
     async def run(self, config: BenchmarkConfig) -> BenchmarkRun:
-        """Run benchmark with given configuration.
-
-        Args:
-            config: Benchmark configuration.
-
-        Returns:
-            BenchmarkRun with results.
-        """
         benchmark_id = f"bench_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}"
 
         logger.info(
@@ -130,13 +110,6 @@ class BenchmarkRunner:
         models: list[str],
         run: BenchmarkRun,
     ) -> None:
-        """Process a batch of tasks.
-
-        Args:
-            tasks: Batch of tasks to process.
-            models: Models to evaluate.
-            run: Benchmark run to update.
-        """
         for task in tasks:
             await self._process_task(task, models, run)
 
@@ -146,13 +119,6 @@ class BenchmarkRunner:
         models: list[str],
         run: BenchmarkRun,
     ) -> None:
-        """Process a single task across all models.
-
-        Args:
-            task: Task to process.
-            models: Models to evaluate.
-            run: Benchmark run to update.
-        """
         prompt = format_math_prompt(task.question)
 
         # Query all models
@@ -202,14 +168,6 @@ class BenchmarkRunner:
         correct_answer: float,
         run: BenchmarkRun,
     ) -> None:
-        """Update consensus statistics.
-
-        Args:
-            model_answers: Answers from each model.
-            correct_answer: Expected correct answer.
-            run: Benchmark run to update.
-        """
-        # Filter out None answers
         valid_answers = {m: a for m, a in model_answers.items() if a is not None}
 
         if not valid_answers:
