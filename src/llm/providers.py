@@ -16,8 +16,6 @@ logger = get_logger(__name__)
 
 @dataclass
 class LLMResponse:
-    """Structured response from LLM provider."""
-
     model: str
     content: str
     tokens_prompt: int
@@ -27,8 +25,6 @@ class LLMResponse:
 
 
 class ICompletionProvider(ABC):
-    """Interface for LLM completion providers."""
-
     @abstractmethod
     async def complete(
         self,
@@ -38,28 +34,13 @@ class ICompletionProvider(ABC):
         temperature: float = 0.0,
         max_tokens: int = 1024,
     ) -> LLMResponse:
-        """Generate completion for the given prompt.
-
-        Args:
-            prompt: User prompt to complete.
-            model: Model identifier (e.g., 'ollama/llama3.2').
-            system_prompt: Optional system prompt.
-            temperature: Sampling temperature (0.0 for deterministic).
-            max_tokens: Maximum tokens in response.
-
-        Returns:
-            LLMResponse with content and metadata.
-
-        Raises:
-            LLMProviderError: If completion fails.
-        """
+        pass
 
 
 class LiteLLMProvider(ICompletionProvider):
-    """LiteLLM-based provider supporting multiple backends."""
+    """Supports Ollama, Groq, Together AI and other LiteLLM backends."""
 
     def __init__(self) -> None:
-        """Initialize LiteLLM provider."""
         settings = get_settings()
 
         # Configure LiteLLM
@@ -81,21 +62,6 @@ class LiteLLMProvider(ICompletionProvider):
         temperature: float = 0.0,
         max_tokens: int = 1024,
     ) -> LLMResponse:
-        """Generate completion using LiteLLM.
-
-        Args:
-            prompt: User prompt to complete.
-            model: Model identifier (e.g., 'ollama/llama3.2').
-            system_prompt: Optional system prompt.
-            temperature: Sampling temperature.
-            max_tokens: Maximum tokens in response.
-
-        Returns:
-            LLMResponse with content and metadata.
-
-        Raises:
-            LLMProviderError: If completion fails.
-        """
         import time
 
         messages = []

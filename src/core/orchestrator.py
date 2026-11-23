@@ -13,8 +13,6 @@ logger = get_logger(__name__)
 
 @dataclass
 class ModelQueryResult:
-    """Result from querying a single model."""
-
     model: str
     success: bool
     response: LLMResponse | None = None
@@ -23,8 +21,6 @@ class ModelQueryResult:
 
 @dataclass
 class OrchestratorResult:
-    """Result from orchestrating queries to multiple models."""
-
     results: dict[str, ModelQueryResult] = field(default_factory=dict)
     total_latency_ms: float = 0.0
     successful_count: int = 0
@@ -32,7 +28,6 @@ class OrchestratorResult:
 
     @property
     def successful_responses(self) -> dict[str, LLMResponse]:
-        """Get only successful responses."""
         return {
             model: result.response
             for model, result in self.results.items()
@@ -41,18 +36,9 @@ class OrchestratorResult:
 
 
 class ModelOrchestrator:
-    """Orchestrates parallel queries to multiple LLM models.
-
-    Sends the same prompt to multiple models concurrently and collects
-    their responses. Handles timeouts and errors gracefully.
-    """
+    """Sends the same prompt to multiple models concurrently."""
 
     def __init__(self, provider: ICompletionProvider) -> None:
-        """Initialize orchestrator with LLM provider.
-
-        Args:
-            provider: LLM completion provider (e.g., LiteLLMProvider).
-        """
         self._provider = provider
         self._settings = get_settings()
 
@@ -64,18 +50,6 @@ class ModelOrchestrator:
         temperature: float = 0.0,
         max_tokens: int = 1024,
     ) -> OrchestratorResult:
-        """Query multiple models in parallel.
-
-        Args:
-            prompt: User prompt to send to all models.
-            models: List of model identifiers. Uses defaults if None.
-            system_prompt: Optional system prompt for all models.
-            temperature: Sampling temperature.
-            max_tokens: Maximum tokens in response.
-
-        Returns:
-            OrchestratorResult with responses from all models.
-        """
         if models is None:
             models = self._settings.default_models
 
@@ -130,18 +104,6 @@ class ModelOrchestrator:
         temperature: float,
         max_tokens: int,
     ) -> ModelQueryResult:
-        """Query a single model with error handling.
-
-        Args:
-            model: Model identifier.
-            prompt: User prompt.
-            system_prompt: Optional system prompt.
-            temperature: Sampling temperature.
-            max_tokens: Maximum tokens.
-
-        Returns:
-            ModelQueryResult with response or error.
-        """
         try:
             response = await self._provider.complete(
                 prompt=prompt,

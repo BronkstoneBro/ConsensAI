@@ -1,6 +1,6 @@
 """Business logic services."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from src.core.config import get_settings
 from src.core.consensus import ConsensusAnalyzer, ConsensusAnalysisResult
@@ -25,8 +25,6 @@ logger = get_logger(__name__)
 
 @dataclass
 class ProcessedModelResult:
-    """Processed result from a single model."""
-
     model: str
     solution: MathSolution | None
     raw_response: str
@@ -37,22 +35,9 @@ class ProcessedModelResult:
 
 
 class ConsensusService:
-    """Service for consensus-based question answering.
-
-    Orchestrates the full flow:
-    1. Send question to multiple models
-    2. Parse structured responses
-    3. Analyze consensus
-    4. Use judge model if disagreement (optional)
-    5. Return unified result
-    """
+    """Orchestrates multi-model queries, parsing, consensus analysis, and judge resolution."""
 
     def __init__(self, provider: ICompletionProvider) -> None:
-        """Initialize service with LLM provider.
-
-        Args:
-            provider: LLM completion provider.
-        """
         self._provider = provider
         self._orchestrator = ModelOrchestrator(provider)
         self._parser = ResponseParser()
@@ -61,17 +46,6 @@ class ConsensusService:
         self._settings = get_settings()
 
     async def analyze(self, request: ConsensusRequest) -> ConsensusResponse:
-        """Analyze question using multiple models and determine consensus.
-
-        Args:
-            request: Consensus request with question and optional model list.
-
-        Returns:
-            ConsensusResponse with consensus result and per-model details.
-
-        Raises:
-            ConsensusError: If no valid responses received.
-        """
         logger.info(
             "consensus_service_started",
             question_length=len(request.question),
@@ -134,15 +108,6 @@ class ConsensusService:
         consensus_result: ConsensusAnalysisResult,
         use_judge: bool,
     ) -> bool:
-        """Determine if judge should be used.
-
-        Args:
-            consensus_result: Initial consensus analysis result.
-            use_judge: User preference for using judge.
-
-        Returns:
-            True if judge should be called.
-        """
         if not use_judge:
             return False
 
@@ -160,15 +125,6 @@ class ConsensusService:
         consensus_result: ConsensusAnalysisResult,
         judge_decision: JudgeDecision,
     ) -> ConsensusAnalysisResult:
-        """Update consensus result based on judge decision.
-
-        Args:
-            consensus_result: Original consensus result.
-            judge_decision: Judge's decision.
-
-        Returns:
-            Updated ConsensusAnalysisResult.
-        """
         logger.info(
             "applying_judge_decision",
             original_answer=consensus_result.answer,
@@ -187,14 +143,6 @@ class ConsensusService:
         self,
         orchestrator_result: OrchestratorResult,
     ) -> dict[str, ProcessedModelResult]:
-        """Process raw responses into structured results.
-
-        Args:
-            orchestrator_result: Raw results from orchestrator.
-
-        Returns:
-            Dict mapping model name to processed result.
-        """
         processed: dict[str, ProcessedModelResult] = {}
 
         for model, query_result in orchestrator_result.results.items():
@@ -234,18 +182,6 @@ class ConsensusService:
         total_latency_ms: float,
         judge_decision: JudgeDecision | None = None,
     ) -> ConsensusResponse:
-        """Build final consensus response.
-
-        Args:
-            processed_results: Processed results from all models.
-            consensus_result: Consensus analysis result.
-            total_latency_ms: Total query latency.
-            judge_decision: Optional judge decision if used.
-
-        Returns:
-            ConsensusResponse for API.
-        """
-        # Build model results dict
         model_results: dict[str, ModelResult] = {}
 
         for model, result in processed_results.items():

@@ -22,11 +22,6 @@ router = APIRouter()
 async def get_metrics(
     repository: BenchmarkRepository = Depends(get_benchmark_repository),
 ) -> MetricsResponse:
-    """Get aggregated metrics and statistics.
-
-    Returns overall statistics including per-model accuracy,
-    latency, and consensus rates.
-    """
     logger.info("metrics_requested")
 
     # Get aggregated model stats

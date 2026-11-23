@@ -1,4 +1,4 @@
-"""FastAPI dependency injection configuration."""
+"""FastAPI dependency injection."""
 
 from collections.abc import AsyncIterator
 from functools import lru_cache
@@ -16,26 +16,20 @@ from src.storage.repository import BenchmarkRepository
 
 @lru_cache
 def get_llm_provider() -> ICompletionProvider:
-    """Get LLM provider instance (cached)."""
     return LiteLLMProvider()
 
 
 @lru_cache
 def get_consensus_service() -> ConsensusService:
-    """Get consensus service instance (cached)."""
-    provider = get_llm_provider()
-    return ConsensusService(provider)
+    return ConsensusService(get_llm_provider())
 
 
 @lru_cache
 def get_benchmark_service() -> BenchmarkRunner:
-    """Get benchmark runner instance (cached)."""
-    provider = get_llm_provider()
-    return BenchmarkRunner(provider)
+    return BenchmarkRunner(get_llm_provider())
 
 
 async def get_db_session() -> AsyncIterator[AsyncSession]:
-    """Get database session for request scope."""
     factory = await get_session_factory()
     async with factory() as session:
         yield session
@@ -44,5 +38,4 @@ async def get_db_session() -> AsyncIterator[AsyncSession]:
 async def get_benchmark_repository(
     session: AsyncSession = Depends(get_db_session),
 ) -> BenchmarkRepository:
-    """Get benchmark repository instance."""
     return BenchmarkRepository(session)

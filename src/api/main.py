@@ -16,7 +16,6 @@ logger = get_logger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Application lifespan manager for startup and shutdown events."""
     settings = get_settings()
     setup_logging(settings.log_level)
 
@@ -37,7 +36,6 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 def create_app() -> FastAPI:
-    """Create and configure FastAPI application."""
     settings = get_settings()
 
     app = FastAPI(
@@ -68,16 +66,10 @@ def create_app() -> FastAPI:
 
     @app.get("/", tags=["health"])
     async def root() -> dict[str, str]:
-        """Root endpoint - health check."""
-        return {
-            "status": "ok",
-            "app": settings.app_name,
-            "version": settings.app_version,
-        }
+        return {"status": "ok", "app": settings.app_name, "version": settings.app_version}
 
     @app.get("/health", tags=["health"])
     async def health() -> dict[str, str]:
-        """Health check endpoint."""
         return {"status": "healthy"}
 
     return app

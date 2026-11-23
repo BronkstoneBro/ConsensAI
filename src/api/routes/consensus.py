@@ -25,11 +25,6 @@ async def analyze_consensus(
     request: ConsensusRequest,
     service: ConsensusService = Depends(get_consensus_service),
 ) -> ConsensusResponse:
-    """Analyze consensus across multiple LLM models.
-
-    Sends the same question to multiple models, collects their answers,
-    and determines the consensus using configurable strategies.
-    """
     logger.info(
         "consensus_request_received",
         question_length=len(request.question),

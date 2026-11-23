@@ -63,3 +63,8 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local development files (not part of project)
+CLAUDE.md
+.claude/
+scripts/

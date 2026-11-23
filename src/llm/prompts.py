@@ -55,27 +55,10 @@ Analyze these answers and determine which is correct."""
 
 
 def format_math_prompt(question: str) -> str:
-    """Format a math question for the model.
-
-    Args:
-        question: The math question to solve.
-
-    Returns:
-        Formatted prompt string.
-    """
     return MATH_USER_PROMPT_TEMPLATE.format(question=question)
 
 
 def format_judge_prompt(question: str, model_answers: dict[str, str]) -> str:
-    """Format a judge prompt with multiple model answers.
-
-    Args:
-        question: The original math question.
-        model_answers: Dict mapping model name to its answer.
-
-    Returns:
-        Formatted prompt string.
-    """
     answers_text = "\n".join(
         f"- {model}: {answer}"
         for model, answer in model_answers.items()

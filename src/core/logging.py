@@ -1,4 +1,4 @@
-"""Structured logging configuration using structlog."""
+"""Structured logging configuration."""
 
 import logging
 import sys
@@ -7,12 +7,6 @@ import structlog
 
 
 def setup_logging(log_level: str = "INFO") -> None:
-    """Configure structured logging for the application.
-
-    Args:
-        log_level: Logging level (DEBUG, INFO, WARNING, ERROR).
-    """
-    # Configure standard library logging
     logging.basicConfig(
         format="%(message)s",
         stream=sys.stdout,
@@ -39,12 +33,4 @@ def setup_logging(log_level: str = "INFO") -> None:
 
 
 def get_logger(name: str | None = None) -> structlog.BoundLogger:
-    """Get a logger instance.
-
-    Args:
-        name: Optional logger name.
-
-    Returns:
-        Configured structlog logger.
-    """
     return structlog.get_logger(name)

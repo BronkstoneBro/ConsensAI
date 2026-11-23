@@ -10,8 +10,6 @@ logger = get_logger(__name__)
 
 @dataclass
 class TaskResult:
-    """Result of a single task evaluation."""
-
     task_id: str
     question: str
     correct_answer: float
@@ -24,8 +22,6 @@ class TaskResult:
 
 @dataclass
 class ModelStats:
-    """Aggregated statistics for a single model."""
-
     model: str
     total_tasks: int = 0
     correct: int = 0
@@ -36,24 +32,19 @@ class ModelStats:
 
     @property
     def accuracy(self) -> float:
-        """Calculate accuracy as fraction of correct answers out of total tasks."""
         return self.correct / self.total_tasks if self.total_tasks > 0 else 0.0
 
     @property
     def avg_latency_ms(self) -> float:
-        """Calculate average latency per task."""
         return self.total_latency_ms / self.total_tasks if self.total_tasks > 0 else 0.0
 
     @property
     def avg_tokens(self) -> float:
-        """Calculate average tokens per task."""
         return self.total_tokens / self.total_tasks if self.total_tasks > 0 else 0.0
 
 
 @dataclass
 class BenchmarkStats:
-    """Overall benchmark statistics."""
-
     total_tasks: int = 0
     models: dict[str, ModelStats] = field(default_factory=dict)
     unanimous_agreement: int = 0
@@ -62,32 +53,15 @@ class BenchmarkStats:
 
     @property
     def consensus_accuracy(self) -> float:
-        """Calculate consensus accuracy (unanimous + majority correct)."""
         total = self.unanimous_agreement + self.majority_agreement + self.disagreement
         return (self.unanimous_agreement + self.majority_agreement) / total if total > 0 else 0.0
 
 
 class Evaluator:
-    """Evaluates model answers against correct answers."""
-
     def __init__(self, tolerance: float = 0.01) -> None:
-        """Initialize evaluator.
-
-        Args:
-            tolerance: Relative tolerance for comparing answers.
-        """
         self._tolerance = tolerance
 
     def is_correct(self, model_answer: float | None, correct_answer: float) -> bool:
-        """Check if model answer matches correct answer.
-
-        Args:
-            model_answer: Answer from the model.
-            correct_answer: Expected correct answer.
-
-        Returns:
-            True if answers match within tolerance.
-        """
         if model_answer is None:
             return False
 
@@ -107,18 +81,6 @@ class Evaluator:
         tokens_used: int,
         error: str | None = None,
     ) -> TaskResult:
-        """Evaluate a single task result.
-
-        Args:
-            task: The math task.
-            model_answer: Model's answer.
-            latency_ms: Response latency.
-            tokens_used: Tokens consumed.
-            error: Error message if any.
-
-        Returns:
-            TaskResult with evaluation.
-        """
         is_correct = self.is_correct(model_answer, task.correct_answer)
 
         result = TaskResult(
@@ -142,20 +104,7 @@ class Evaluator:
 
         return result
 
-    def aggregate_results(
-        self,
-        model: str,
-        results: list[TaskResult],
-    ) -> ModelStats:
-        """Aggregate results into model statistics.
-
-        Args:
-            model: Model identifier.
-            results: List of task results.
-
-        Returns:
-            ModelStats with aggregated metrics.
-        """
+    def aggregate_results(self, model: str, results: list[TaskResult]) -> ModelStats:
         stats = ModelStats(model=model, total_tasks=len(results))
 
         for result in results:
