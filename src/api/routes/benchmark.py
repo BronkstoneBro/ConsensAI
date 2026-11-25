@@ -1,5 +1,3 @@
-"""Benchmark API endpoints."""
-
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from src.api.dependencies import get_benchmark_repository, get_benchmark_service
