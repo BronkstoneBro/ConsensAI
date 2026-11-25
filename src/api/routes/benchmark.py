@@ -1,5 +1,3 @@
-"""Benchmark API endpoints."""
-
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from src.api.dependencies import get_benchmark_repository, get_benchmark_service
@@ -35,22 +33,18 @@ async def run_benchmark(
     )
 
     try:
-        # Build config
         config = BenchmarkConfig(
             dataset=request.dataset,
             models=request.models or [],
             limit=request.limit,
         )
 
-        # Use default models if none specified
         if not config.models:
             from src.core.config import get_settings
             config.models = get_settings().default_models
 
-        # Run benchmark
         run = await runner.run(config)
 
-        # Save results to database
         await repository.save_benchmark_run(run)
         logger.info("benchmark_saved_to_db", benchmark_id=run.benchmark_id)
 
@@ -95,6 +89,29 @@ async def run_benchmark(
 
 
 @router.get(
+    "/benchmark/list",
+    summary="List benchmark runs",
+    description="Get list of all benchmark runs.",
+)
+async def list_benchmarks(
+    limit: int = 50,
+    offset: int = 0,
+    repository: BenchmarkRepository = Depends(get_benchmark_repository),
+) -> list[dict]:
+    runs = await repository.get_all_benchmark_runs(limit=limit, offset=offset)
+    return [
+        {
+            "benchmark_id": run.benchmark_id,
+            "dataset": run.dataset,
+            "status": run.status,
+            "total_tasks": run.total_tasks,
+            "created_at": run.created_at.isoformat() if run.created_at else None,
+        }
+        for run in runs
+    ]
+
+
+@router.get(
     "/benchmark/{benchmark_id}",
     response_model=BenchmarkResponse,
     summary="Get benchmark status",
@@ -106,7 +123,6 @@ async def get_benchmark(
 ) -> BenchmarkResponse:
     logger.info("benchmark_status_requested", benchmark_id=benchmark_id)
 
-    # Fetch benchmark run from database
     run = await repository.get_benchmark_run(benchmark_id)
 
     if run is None:
@@ -115,10 +131,8 @@ async def get_benchmark(
             detail={"code": "NOT_FOUND", "message": f"Benchmark {benchmark_id} not found"},
         )
 
-    # Fetch model stats
     model_stats_list = await repository.get_model_stats_for_run(run.id)
 
-    # Convert to response
     results = {}
     for stats in model_stats_list:
         results[stats.model] = BenchmarkModelStats(
@@ -142,29 +156,6 @@ async def get_benchmark(
             disagreement=run.disagreement,
         ),
     )
-
-
-@router.get(
-    "/benchmark/list",
-    summary="List benchmark runs",
-    description="Get list of all benchmark runs.",
-)
-async def list_benchmarks(
-    limit: int = 50,
-    offset: int = 0,
-    repository: BenchmarkRepository = Depends(get_benchmark_repository),
-) -> list[dict]:
-    runs = await repository.get_all_benchmark_runs(limit=limit, offset=offset)
-    return [
-        {
-            "benchmark_id": run.benchmark_id,
-            "dataset": run.dataset,
-            "status": run.status,
-            "total_tasks": run.total_tasks,
-            "created_at": run.created_at.isoformat() if run.created_at else None,
-        }
-        for run in runs
-    ]
 
 
 @router.get(
