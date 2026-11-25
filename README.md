@@ -314,15 +314,6 @@ ruff format src/
 ruff check src/
 ```
 
-## Roadmap
-
-- [ ] WebSocket streaming for real-time responses
-- [ ] Additional consensus algorithms (weighted voting)
-- [ ] Model performance heatmaps
-- [ ] Export benchmark results to CSV/PDF
-- [ ] Docker Compose deployment
-- [ ] CI/CD pipeline
-
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.
