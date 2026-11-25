@@ -2,7 +2,7 @@
 
 > Multi-LLM orchestration system with consensus mechanism for reliable answers and objective benchmarking.
 
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.14+](https://img.shields.io/badge/python-3.14+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green.svg)](https://fastapi.tiangolo.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -76,7 +76,7 @@ Using mathematical tasks as the primary test case provides:
 
 ### Prerequisites
 
-- Python 3.11+
+- Python 3.14+
 - Groq API key (free tier: [console.groq.com](https://console.groq.com))
 - (Optional) Ollama for local models
 
