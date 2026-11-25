@@ -42,15 +42,12 @@ async def run_benchmark(
             limit=request.limit,
         )
 
-        # Use default models if none specified
         if not config.models:
             from src.core.config import get_settings
             config.models = get_settings().default_models
 
-        # Run benchmark
         run = await runner.run(config)
 
-        # Save results to database
         await repository.save_benchmark_run(run)
         logger.info("benchmark_saved_to_db", benchmark_id=run.benchmark_id)
 
@@ -129,7 +126,6 @@ async def get_benchmark(
 ) -> BenchmarkResponse:
     logger.info("benchmark_status_requested", benchmark_id=benchmark_id)
 
-    # Fetch benchmark run from database
     run = await repository.get_benchmark_run(benchmark_id)
 
     if run is None:
@@ -138,10 +134,8 @@ async def get_benchmark(
             detail={"code": "NOT_FOUND", "message": f"Benchmark {benchmark_id} not found"},
         )
 
-    # Fetch model stats
     model_stats_list = await repository.get_model_stats_for_run(run.id)
 
-    # Convert to response
     results = {}
     for stats in model_stats_list:
         results[stats.model] = BenchmarkModelStats(
