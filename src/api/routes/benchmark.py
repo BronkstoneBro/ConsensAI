@@ -35,7 +35,6 @@ async def run_benchmark(
     )
 
     try:
-        # Build config
         config = BenchmarkConfig(
             dataset=request.dataset,
             models=request.models or [],
