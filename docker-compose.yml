@@ -1,5 +1,15 @@
+# =============================================================================
 # ConsensAI Docker Compose Configuration
-version: "3.9"
+# =============================================================================
+# Uses UV for fast, secure dependency management with lockfile verification.
+#
+# Quick start:
+#   docker compose up -d
+#
+# For production, set environment variables:
+#   GROQ_API_KEY=your-key
+#   LITELLM_MASTER_KEY=your-secure-key (optional, for LiteLLM proxy auth)
+# =============================================================================
 
 services:
   api:
@@ -14,6 +24,8 @@ services:
       - OLLAMA_BASE_URL=http://ollama:11434
       - DATABASE_URL=sqlite+aiosqlite:///./data/consensai.db
       - LOG_LEVEL=INFO
+      # LiteLLM Proxy Authentication (optional, for production)
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY:-}
     volumes:
       - ./data:/app/data
     depends_on:

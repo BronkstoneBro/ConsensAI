@@ -1,27 +1,40 @@
+# =============================================================================
 # LiteLLM Configuration for ConsensAI
+# =============================================================================
 # Documentation: https://docs.litellm.ai/docs/
+#
+# Security Configuration:
+# - master_key: Admin key for LiteLLM proxy management
+# - general_settings.master_key: Enables authentication for all requests
+# - API keys are loaded from environment variables
+#
+# For production deployment:
+# 1. Generate a secure master_key: openssl rand -hex 32
+# 2. Set LITELLM_MASTER_KEY environment variable
+# 3. Create virtual keys for different services
+# =============================================================================
 
 model_list:
   # Ollama Models (local)
   - model_name: ollama/llama3.2
     litellm_params:
       model: ollama/llama3.2
-      api_base: http://localhost:11434
+      api_base: ${OLLAMA_BASE_URL:-http://localhost:11434}
 
   - model_name: ollama/mistral
     litellm_params:
       model: ollama/mistral
-      api_base: http://localhost:11434
+      api_base: ${OLLAMA_BASE_URL:-http://localhost:11434}
 
   - model_name: ollama/phi3
     litellm_params:
       model: ollama/phi3
-      api_base: http://localhost:11434
+      api_base: ${OLLAMA_BASE_URL:-http://localhost:11434}
 
   - model_name: ollama/gemma2
     litellm_params:
       model: ollama/gemma2
-      api_base: http://localhost:11434
+      api_base: ${OLLAMA_BASE_URL:-http://localhost:11434}
 
   # Groq Models (free tier)
   # Get API key at: https://console.groq.com/
@@ -40,10 +53,36 @@ model_list:
       model: groq/mixtral-8x7b-32768
       api_key: os.environ/GROQ_API_KEY
 
-# General settings
+# LiteLLM-specific settings
 litellm_settings:
   drop_params: true
   set_verbose: false
+  # Rate limiting (optional)
+  # max_budget: 100  # Max budget in USD
+  # budget_duration: "1d"  # Budget reset period
+
+# =============================================================================
+# Authentication & Security Settings
+# =============================================================================
+# When running LiteLLM as a proxy server, enable authentication:
+#
+# Production setup:
+# 1. Set environment variable: LITELLM_MASTER_KEY=sk-your-secure-key
+# 2. The proxy will require Authorization header for all requests
+# 3. Create virtual keys for different applications/services
+#
+# Development setup:
+# - Set master_key: null to disable authentication
+# =============================================================================
 
 general_settings:
-  master_key: null  # No authentication for local development
+  # Master key for LiteLLM proxy authentication
+  # Set via LITELLM_MASTER_KEY environment variable for security
+  master_key: ${LITELLM_MASTER_KEY:-null}
+
+  # Database for storing virtual keys, spend tracking, etc.
+  # Uncomment for production use with key management
+  # database_url: "postgresql://user:pass@localhost:5432/litellm"
+
+  # Enable detailed request logging (disable in production)
+  store_model_in_db: false
