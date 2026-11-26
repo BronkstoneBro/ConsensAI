@@ -2,8 +2,9 @@
 
 > Multi-LLM orchestration system with consensus mechanism for reliable answers and objective benchmarking.
 
-[![Python 3.14+](https://img.shields.io/badge/python-3.14+-blue.svg)](https://www.python.org/downloads/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green.svg)](https://fastapi.tiangolo.com/)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.163+-green.svg)](https://fastapi.tiangolo.com/)
+[![uv](https://img.shields.io/badge/uv-package%20manager-blueviolet.svg)](https://docs.astral.sh/uv/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Overview
@@ -76,11 +77,39 @@ Using mathematical tasks as the primary test case provides:
 
 ### Prerequisites
 
-- Python 3.14+
+- Python 3.11+
+- [uv](https://docs.astral.sh/uv/) package manager (recommended) or pip
 - Groq API key (free tier: [console.groq.com](https://console.groq.com))
 - (Optional) Ollama for local models
 
 ### Installation
+
+#### Option A: Using UV (Recommended)
+
+[UV](https://docs.astral.sh/uv/) provides fast, secure dependency management with lockfile verification to prevent supply chain attacks.
+
+```bash
+# Install UV (if not installed)
+# On macOS/Linux:
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# On Windows:
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# Clone repository
+git clone https://github.com/yourusername/ConsensAI.git
+cd ConsensAI
+
+# Install dependencies (uses uv.lock for reproducible builds)
+uv sync
+
+# With dashboard support
+uv sync --extra dashboard
+
+# For development
+uv sync --group dev
+```
+
+#### Option B: Using pip
 
 ```bash
 # Clone repository
@@ -92,7 +121,10 @@ python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install dependencies
-pip install -r requirements.txt
+pip install -e .
+
+# With dashboard
+pip install -e ".[dashboard]"
 ```
 
 ### Configuration
@@ -113,10 +145,14 @@ DEFAULT_MODELS=["groq/llama3-8b-8192", "groq/mixtral-8x7b-32768"]
 ### Run the Server
 
 ```bash
-# Start API server
-uvicorn src.api.main:app --reload --port 8000
+# Using UV (recommended)
+uv run uvicorn src.api.main:app --reload --port 8000
 
 # In another terminal, start dashboard (optional)
+uv run streamlit run dashboard/streamlit_app.py
+
+# Or with activated venv
+uvicorn src.api.main:app --reload --port 8000
 streamlit run dashboard/streamlit_app.py
 ```
 
@@ -231,6 +267,16 @@ Three difficulty levels of math problems:
 | `algebra` | Medium | Linear equations, quadratics |
 | `logic` | Hard | Word problems, sequences |
 
+### Benchmark Results
+
+Detailed benchmark results and analysis are available in [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md).
+
+Key metrics tracked:
+- **Accuracy** - Percentage of correct answers per model
+- **Latency** - Response time in milliseconds
+- **Consensus rate** - How often models agree
+- **Cost** - Token usage per query
+
 ## Dashboard
 
 The Streamlit dashboard provides:
@@ -301,18 +347,53 @@ Via LiteLLM, ConsensAI supports:
 ## Development
 
 ```bash
-# Run tests
+# Using UV (recommended)
+uv run pytest tests/
+uv run mypy src/
+uv run ruff format src/
+uv run ruff check src/
+
+# Or activate venv and run directly
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pytest tests/
-
-# Type checking
 mypy src/
-
-# Format code
 ruff format src/
-
-# Lint
 ruff check src/
 ```
+
+### Updating Dependencies
+
+```bash
+# Update lockfile after changing pyproject.toml
+uv lock
+
+# Upgrade all dependencies to latest compatible versions
+uv lock --upgrade
+```
+
+## Security
+
+### Dependency Management
+
+This project uses [UV](https://docs.astral.sh/uv/) with a lockfile (`uv.lock`) that includes cryptographic hashes for all dependencies. This provides protection against supply chain attacks by:
+
+- **Hash verification** - Every package is verified against its recorded hash
+- **Reproducible builds** - Same dependencies across all environments
+- **Tamper detection** - Any modification to packages is detected
+
+### LiteLLM Proxy Authentication
+
+For production deployments, enable LiteLLM proxy authentication:
+
+```bash
+# Generate a secure master key
+openssl rand -hex 32
+
+# Set in environment
+export LITELLM_MASTER_KEY=sk-your-generated-key
+```
+
+See [`configs/litellm_config.yaml`](configs/litellm_config.yaml) for configuration details.
 
 ## License
 
