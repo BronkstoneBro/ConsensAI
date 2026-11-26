@@ -269,13 +269,25 @@ Three difficulty levels of math problems:
 
 ### Benchmark Results
 
-Detailed benchmark results and analysis are available in [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md).
+**Test configuration:** 66 math tasks, 2 models (Groq API), temperature 0.0
 
-Key metrics tracked:
-- **Accuracy** - Percentage of correct answers per model
-- **Latency** - Response time in milliseconds
-- **Consensus rate** - How often models agree
-- **Cost** - Token usage per query
+| Model | Accuracy | Avg Latency | Consensus Rate |
+|-------|----------|-------------|----------------|
+| groq/openai/gpt-oss-20b | **59.09%** | 272.6ms | 60.6% unanimous |
+| groq/qwen/qwen3.8-27b | 27.27% | 185.9ms | 60.6% unanimous |
+
+**Accuracy by difficulty:**
+
+| Difficulty | gpt-oss-20b | qwen3.8-27b |
+|------------|-------------|-------------|
+| Easy (arithmetic) | 100% | 52% |
+| Medium (algebra) | 45% | 10% |
+| Hard (logic) | 20% | 10% |
+
+**Key findings:**
+- Consensus correlates with correctness — unanimous answers are more reliable
+- Accuracy drops significantly as task difficulty increases
+- Trade-off: faster model (qwen) is 2x less accurate than slower model (gpt-oss)
 
 ## Dashboard
 
